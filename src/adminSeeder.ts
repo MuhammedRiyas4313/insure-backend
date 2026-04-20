@@ -1,32 +1,32 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Admin from './models/Admin.js';
-import connectDB from './config/db.js';
 
 dotenv.config();
 
 const seedAdmin = async () => {
   try {
-    await connectDB();
+    await mongoose.connect(process.env.MONGODB_URI as string);
+    console.log('Connected to MongoDB for seeding...');
 
-    // Check if admin already exists
-    const adminExists = await Admin.findOne({ email: 'admin@insure.com' });
+    // Clear existing admins
+    await Admin.deleteMany({});
+    console.log('Cleaned existing admins.');
 
-    if (adminExists) {
-      console.log('Admin already exists');
-      process.exit();
-    }
-
+    // Create new admin
     const admin = new Admin({
-      email: 'admin@insure.com',
-      password: 'insure@1234' // Will be hashed by pre-save hook
+      username: 'admin',
+      password: 'admin@123'
     });
 
     await admin.save();
-    console.log('Admin seeded successfully');
+    console.log('Admin user seeded successfully!');
+    console.log('Username: admin');
+    console.log('Password: admin@123');
+
     process.exit();
   } catch (error) {
-    console.error(`Error: ${(error as Error).message}`);
+    console.error('Error seeding admin:', error);
     process.exit(1);
   }
 };

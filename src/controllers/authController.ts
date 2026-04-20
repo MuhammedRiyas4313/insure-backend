@@ -3,10 +3,10 @@ import jwt from 'jsonwebtoken';
 import Admin from '../models/Admin.js';
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body; // Changed from email to username
 
   try {
-    const admin = await Admin.findOne({ email });
+    const admin = await Admin.findOne({ username });
 
     if (admin && (await (admin as any).comparePassword(password))) {
       const token = jwt.sign(
@@ -17,11 +17,11 @@ export const login = async (req: Request, res: Response) => {
 
       res.json({
         _id: admin._id,
-        email: admin.email,
+        username: admin.username,
         token
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: 'Invalid username or password' });
     }
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
